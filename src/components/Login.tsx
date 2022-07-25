@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {gql, useMutation} from "@apollo/client";
-import {AUTH_TOKEN} from "../constants";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { gql, useMutation } from "@apollo/client";
+import { AUTH_TOKEN } from "../constants";
 
 const SIGNUP_MUTATION = gql`
     mutation SignupMutation(
@@ -45,7 +45,7 @@ const Login = () => {
       email: formState.email,
       password: formState.password
     },
-    onCompleted: ({login}) => {
+    onCompleted: ({ login }) => {
       localStorage.setItem(AUTH_TOKEN, login.token);
       navigate('/');
     }
@@ -57,7 +57,7 @@ const Login = () => {
       email: formState.email,
       password: formState.password
     },
-    onCompleted: ({signup}) => {
+    onCompleted: ({ signup }) => {
       localStorage.setItem(AUTH_TOKEN, signup.token);
       navigate('/');
     }
@@ -108,7 +108,9 @@ const Login = () => {
       <div className="flex mt3">
         <button
           className="pointer mr2 button"
-          onClick={formState.login ? login : signup}
+          onClick={() => {
+            return formState.login ? login() : signup()
+          }}
         >
           {formState.login ? 'login' : 'create account'}
         </button>

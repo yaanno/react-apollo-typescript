@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {useLazyQuery, gql} from '@apollo/client';
 import Link from './Link';
+import { LinkType } from '../types';
 
 const FEED_SEARCH_QUERY = gql`
     query FeedSearchQuery($filter: String!) {
@@ -46,7 +47,7 @@ const Search = () => {
         </button>
       </div>
       {data &&
-      data.feed.links.map((link, index) => (
+      data.feed.links.map((link: LinkType, index: number) => (
         <Link key={link.id} link={link} index={index} />
       ))}
     </>

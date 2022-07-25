@@ -1,9 +1,10 @@
 import React from 'react';
 import Link from './Link';
+import { FeedType, LinkType } from '../types';
 import { LINKS_PER_PAGE } from '../constants';
 
-import {useQuery, gql} from '@apollo/client';
-import {useLocation, useNavigate} from 'react-router-dom';
+import { useQuery, gql } from '@apollo/client';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const NEW_LINKS_SUBSCRIPTION = gql`
     subscription {
@@ -84,18 +85,18 @@ export const FEED_QUERY = gql`
 `;
 
 
-const getQueryVariables = (isNewPage, page) => {
+const getQueryVariables = (isNewPage: boolean, page: number) => {
   const skip = isNewPage ? (page - 1) * LINKS_PER_PAGE : 0;
   const take = isNewPage ? LINKS_PER_PAGE : 100;
   const orderBy = { createdAt: 'desc' };
   return { take, skip, orderBy };
 };
 
-const getLinksToRender = (isNewPage, data) => {
+const getLinksToRender = (isNewPage: boolean, data: { feed: FeedType }) => {
   if (isNewPage) {
     return data.feed.links;
   }
-  const rankedLinks = data.feed.links.slice();
+  const rankedLinks: LinkType[] = data.feed.links.slice();
   rankedLinks.sort(
     (l1, l2) => l2.votes.length - l1.votes.length
   );
@@ -103,7 +104,7 @@ const getLinksToRender = (isNewPage, data) => {
 };
 
 
-const LinkList = ({client}) => {
+const LinkList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isNewPage = location.pathname.includes(
@@ -117,9 +118,6 @@ const LinkList = ({client}) => {
   );
   const pageIndex = page ? (page - 1) * LINKS_PER_PAGE : 0;
 
-
-
-
   const {
     data,
     loading,
@@ -132,11 +130,11 @@ const LinkList = ({client}) => {
 
   subscribeToMore({
     document: NEW_LINKS_SUBSCRIPTION,
-    updateQuery: (prev, {subscriptionData}) => {
+    updateQuery: (prev, { subscriptionData }) => {
       if (!subscriptionData.data) return prev;
-      const newLink = subscriptionData.data.newLink;
+      const newLink: LinkType = subscriptionData.data.newLink;
       const exists = prev.feed.links.find(
-        ({id}) => id === newLink.id
+        (link: LinkType) => link.id === newLink.id
       );
       if (exists) return prev;
 
@@ -162,7 +160,7 @@ const LinkList = ({client}) => {
       {data && (
         <>
           {getLinksToRender(isNewPage, data).map(
-            (link, index) => (
+            (link: LinkType, index: number) => (
               <Link
                 key={link.id}
                 link={link}
@@ -185,12 +183,8 @@ const LinkList = ({client}) => {
               <div
                 className="pointer"
                 onClick={() => {
-                  if (
-                    page <=
-                    data.feed.count / LINKS_PER_PAGE
-                  ) {
-                    const nextPage = page + 1;
-                    navigate(`/new/${nextPage}`);
+                  if (page < data.feed.count / LINKS_PER_PAGE) {
+                    navigate(`/new/${page + 1}`);
                   }
                 }}
               >
