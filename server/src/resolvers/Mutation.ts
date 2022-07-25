@@ -1,13 +1,14 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const {APP_SECRET} = require('../utils');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { APP_SECRET } from '../utils';
 
-async function post(parent, args, context, info) {
-  const {userId} = context;
+// @ts-ignore
+const post = async (parent, args, context, info) => {
+  const { userId } = context;
 
   let postedBy = undefined
   if (userId) {
-    postedBy = {connect: {id: userId}}
+    postedBy = { connect: { id: userId } }
   }
 
   const newLink = await context.prisma.link.create({
@@ -23,13 +24,14 @@ async function post(parent, args, context, info) {
   return newLink;
 }
 
-async function signup(parent, args, context, info) {
+// @ts-ignore
+const signup = async (parent, args, context, info) => {
   const password = await bcrypt.hash(args.password, 10);
   const user = await context.prisma.user.create({
-    data: {...args, password}
+    data: { ...args, password }
   });
 
-  const token = jwt.sign({userId: user.id}, APP_SECRET);
+  const token = jwt.sign({ userId: user.id }, APP_SECRET);
 
   return {
     token,
@@ -37,9 +39,10 @@ async function signup(parent, args, context, info) {
   };
 }
 
-async function login(parent, args, context, info) {
+// @ts-ignore
+const login = async (parent, args, context, info) => {
   const user = await context.prisma.user.findUnique({
-    where: {email: args.email}
+    where: { email: args.email }
   });
   if (!user) {
     throw new Error('No such user found');
@@ -53,7 +56,7 @@ async function login(parent, args, context, info) {
     throw new Error('Invalid password');
   }
 
-  const token = jwt.sign({userId: user.id}, APP_SECRET);
+  const token = jwt.sign({ userId: user.id }, APP_SECRET);
 
   return {
     token,
@@ -61,8 +64,9 @@ async function login(parent, args, context, info) {
   };
 }
 
-async function vote(parent, args, context, info) {
-  const {userId} = context;
+// @ts-ignore
+const vote = async (parent, args, context, info) => {
+  const { userId } = context;
 
   const vote = await context.prisma.vote.findUnique({
     where: {
@@ -81,8 +85,8 @@ async function vote(parent, args, context, info) {
 
   const newVote = context.prisma.vote.create({
     data: {
-      user: {connect: {id: userId}},
-      link: {connect: {id: args.linkId}}
+      user: { connect: { id: userId } },
+      link: { connect: { id: args.linkId } }
     }
   });
   context.pubsub.publish('NEW_VOTE', newVote);
@@ -90,7 +94,7 @@ async function vote(parent, args, context, info) {
   return newVote;
 }
 
-module.exports = {
+export default {
   post,
   signup,
   login,

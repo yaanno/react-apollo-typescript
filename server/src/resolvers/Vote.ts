@@ -1,16 +1,18 @@
-function link(parent, args, context) {
+// @ts-ignore
+const link = (parent, args, context) => {
   return context.prisma.vote
     .findUnique({where: {id: parent.id}})
     .link();
 }
 
-function user(parent, args, context) {
+// @ts-ignore
+const user = (parent, args, context) => {
   return context.prisma.vote
     .findUnique({where: {id: parent.id}})
     .user();
 }
 
-module.exports = {
+export default {
   link,
   user
 };

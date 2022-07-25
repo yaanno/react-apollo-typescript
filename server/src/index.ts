@@ -1,14 +1,14 @@
-const { ApolloServer, PubSub } = require('apollo-server');
-const { PrismaClient } = require('@prisma/client');
-const Query = require('./resolvers/Query');
-const Mutation = require('./resolvers/Mutation');
-const Subscription = require('./resolvers/Subscription');
-const User = require('./resolvers/User');
-const Link = require('./resolvers/Link');
-const Vote = require('./resolvers/Vote');
-const fs = require('fs');
-const path = require('path');
-const { getUserId } = require('./utils');
+import { ApolloServer, PubSub } from 'apollo-server';
+import { PrismaClient } from '@prisma/client';
+import Query from './resolvers/Query';
+import Mutation from './resolvers/Mutation';
+import Subscription from './resolvers/Subscription';
+import User from './resolvers/User';
+import Link from './resolvers/Link';
+import Vote from './resolvers/Vote';
+import fs from 'fs';
+import path from 'path';
+import { getUserId } from './utils';
 
 const pubsub = new PubSub();
 
@@ -43,7 +43,7 @@ const server = new ApolloServer({
     };
   },
   subscriptions: {
-    onConnect: (connectionParams) => {
+    onConnect: (connectionParams: { authToken?: string }) => {
       if (connectionParams.authToken) {
         return {
           prisma,
